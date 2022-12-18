@@ -47,6 +47,7 @@ export class GameGateway {
 
   @SubscribeMessage("update")
 	async handleUpdate(client: Socket, user: any): Promise<void> {
+    console.log ("Handle update",user)
     return this.gameService.update(client, user);
 	}
 

@@ -16,7 +16,7 @@ export class GameService {
   private roomPrefix = 'roomGameSocket';
 
   newPlayer(client: Socket, user: any): any {
-    // console.log('Adding a new Player.', user);
+    console.log('Adding a new Player.', user);
     this.queue.push({ user: user, client });
     // console.log('this is the)
     if (this.queue.length === 2) {
@@ -39,9 +39,14 @@ export class GameService {
       LeftSock.join(this.roomPrefix + gameId);
       RightSock.join(this.roomPrefix + gameId);
 
-      // console.log('-----------------------------------------------');
-      // console.log('PlayerLeft : ', playerLeft.user);
-      // console.log('PlayerRight : ', playerRight.user);
+      console.log('-----------------------------------------------');
+
+      console.log('PlayerLeft : ', playerLeft);
+      console.log('PlayerRight : ', playerRight);
+      console.log('-----------------------------------------------');
+      console.log('Game : ', game);
+
+
 
       //   playerLeft.client.join(this.roomPrefix + gameId);
       //   playerRight.client.join(this.roomPrefix + gameId);
@@ -59,7 +64,9 @@ export class GameService {
       };
       // const PlayerLeftString = JSON.stringify(game.player_left, replacerFunc());
       // const PlayerRightString = JSON.stringify(game.player_right, replacerFunc());
-      const pongData = JSON.stringify(game.update(), replacerFunc());
+      const pongData = JSON.stringify(game.update(game.player_left.id), replacerFunc());
+      const rightData = JSON.stringify(game.update(game.player_right.id), replacerFunc());
+
       // console.log('gameId : ', gameId);
       LeftSock.to(this.roomPrefix + gameId).emit('matchFound', {
         // id: gameId,
@@ -73,7 +80,7 @@ export class GameService {
         // id: gameId,
         // player_left: this.games[gameId].player_left.id,
         // player_right: this.games[gameId].player_right.id,
-        pongData: pongData,
+        pongData: rightData,
       });
     }
     return { client: client, user: user };
@@ -89,15 +96,21 @@ export class GameService {
   // }
 
   update(client: Socket, user: any): any {
-    console.log("Inside  update ! ");
+    console.log("Inside  update ! " ,user.user);
+    
+    const parsed = JSON.parse(user.user);
+    console.log("Inside  Position ! " ,user.positon);
+
+    console.log("Parsed  update ! " ,parsed);
+
+
     const gameId = this.PlayersGames[user];
     const game = this.games.get(gameId);
     if (game) {
 
       console.log("Sending the infos ! ",game)
 
-      // const LeftSock: Socket = game.player_left.id.client;
-      // const RightSock: Socket = game.player_left.id.client;
+     
 
 
       const replacerFunc = () => {
@@ -114,19 +127,37 @@ export class GameService {
       };
       // const PlayerLeftString = JSON.stringify(game.player_left, replacerFunc());
       // const PlayerRightString = JSON.stringify(game.player_right, replacerFunc());
-      const pongData = JSON.stringify(game.update(), replacerFunc());
-      
-       client.to(this.roomPrefix + gameId).emit('update', {
-        pongData:pongData
-      });
-      // LeftSock.to(this.roomPrefix + gameId).emit('update', {
+
+       // const LeftSock: Socket = game.player_left.id.client;
+      // const RightSock: Socket = game.player_left.id.client;
+
+         // LeftSock.to(this.roomPrefix + gameId).emit('update', {
       //   pongData:pongData
       // });
       // RightSock.to(this.roomPrefix + gameId).emit('update', 
       // {pongData:pongData});
+      if(parsed.nickname == game.player_left.id)
+      {
+        console.log("its left" + game.player_left.id)
+      game.onUpdate(game.player_left.id,user.positon)
+
+      }
+      else if (parsed.nickname == game.player_right.id)
+      {
+        console.log("its right" + game.player_right.id)
+
+        game.onUpdate(game.player_right.id,user.positon)
+
+      }
+      const pongData = JSON.stringify(game.update(parsed.nickname), replacerFunc());
+      
+       client.to(this.roomPrefix + gameId).emit('update', {
+        pongData:pongData
+      });
+   
 
     }
-    return game.update();
+    // return game.update(user);
   }
 
   // getAllGames(): any{

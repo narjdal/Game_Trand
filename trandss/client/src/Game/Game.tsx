@@ -274,7 +274,7 @@ export default function Game(props: any) {
       console.log("update player");
       gameState.socket.on("update", (data: any) => {
         gameState.pongData = JSON.parse(data.pongData);
-        console.log(gameState.pongData);
+        console.log("Update: ",gameState.pongData);
         if (gameState.pongData.isPlaying)
           setPlaying(true);
         else
@@ -334,7 +334,9 @@ export default function Game(props: any) {
         }
         else if (gameState.playerTool === "keybord") {
           if (p5.keyIsDown(p5.UP_ARROW) && gameState.playerPosition > 0) {
-            gameState.pongData.playerLeft.position -= 0.03;
+            // gameState.pongData.playerLeft.position -= 0.03;
+            gameState.playerPosition -= 0.03;
+
           }
           else if (p5.keyIsDown(p5.DOWN_ARROW) && gameState.pongData.playerLeft.position < 0.75) {
             gameState.playerPosition += 0.03;
@@ -342,12 +344,15 @@ export default function Game(props: any) {
         }
         if (gameState.socket && ((gameState.playerPosition
            !== gameState.pongData.playerLeft.position
-        /*  && gameState.pongData.userRool === "left" */) || (gameState.playerPosition !==
+          && gameState.pongData.userRool === "left" ) || (gameState.playerPosition !==
           gameState.pongData.playerRight.position 
-          /*&& gameState.pongData.userRool === "right"*/
+          && gameState.pongData.userRool === "right"
           ))) {
             // console.log("Emiting an OnUpdate ");
-            gameState.socket.emit("update", { positon: gameState.playerPosition});
+            gameState.socket.emit("update", {
+              user:localStorage.getItem("user")!,
+               positon: gameState.playerPosition
+              });
           }
         console.log('check', gameState.socket && Playing)
         if (gameState.socket && Playing) {

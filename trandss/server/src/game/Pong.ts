@@ -56,6 +56,7 @@ export default class pong {
   }
 
   onUpdate(playerId: string, position_2: number): any {
+    console.log("Inside On Update !" , playerId)
     if (playerId === this.player_left.id) {
       this.player_left.y = position_2 * height;
     } else if (playerId === this.player_right.id) {
@@ -63,7 +64,7 @@ export default class pong {
     }
   }
 
-  update(): any {
+  update(user:any): any {
     this.music = '';
     if (this.ball.x - this.ball.radius < 0) {
       this.player_right.score++;
@@ -97,11 +98,12 @@ export default class pong {
       this.ball.velocity_Y = this.ball.speed * Math.sin(angle_rad);
       this.ball.speed += 0.3;
     }
-    return this.getPongData();
+    return this.getPongData(user);
   }
 
   getPongData(playerId: any = null): any {
     let userRool: any;
+    console.log("Player ID :  " + JSON.stringify(playerId) , " LEFT ID :" +  this.player_left.id  + " RIGHT ID : " + this.player_right.id)
     if (playerId === this.player_left.id) userRool = 'left';
     else if (playerId === this.player_right.id) userRool = 'right';
     else userRool = 'watcher';
